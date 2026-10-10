@@ -1,0 +1,77 @@
+package bot;
+
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
+
+import java.util.List;
+//import java.util.Random;
+
+public class Bot {
+
+    private final TelegramBot bot;
+
+    public Bot(String token) {
+        bot = new TelegramBot(token);
+    }
+
+    public void start() {
+        bot.setUpdatesListener(this::processUpdates);
+    }
+
+    private int processUpdates(List<Update> updates) {
+        for (Update update : updates) {
+            processUpdate(update);
+        }
+        return UpdatesListener.CONFIRMED_UPDATES_ALL;
+    }
+
+    private void processUpdate(Update update) {
+        if (update.message() == null || update.message().text() == null) {return;}
+
+        long chatId = update.message().chat().id();
+        String text = update.message().text();
+        String answer = processCommand(text);
+
+        bot.execute(new SendMessage(chatId, answer));
+    }
+
+    private String processCommand(String text) {
+        String[] parts = text.split(" ", 2);
+        String command = parts[0];
+
+        return switch (command) {
+            case "/start" -> commandStart();
+            case "/help" -> commandHelp();
+            case "/categories" -> commandCategories();
+            case "/history" -> commandHistory();
+            default -> "Ты написал: " + text;
+        };
+    }
+
+    private String commandStart() {
+        return "Привет! Этот бот поможет тебе учитывать свои расходы\nВведи /help чтобы увидеть список доступных комманд";
+    }
+
+    private String commandCategories() {
+        StringBuilder result = new StringBuilder();
+
+        for (ExpenseCategory category : ExpenseCategory.values()) {
+            result.append(category.getEmoji())
+                    .append(" ")
+                    .append(category.getTitle())
+                    .append("\n");
+        }
+
+        return result.toString();
+    }
+
+    private String commandHistory() {
+        return "";
+    }
+
+    private String commandHelp() {
+        return "привет";
+    }
+}
