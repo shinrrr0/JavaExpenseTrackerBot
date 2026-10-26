@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import java.io.IOException;
 
 import java.util.List;
 //import java.util.Random;
@@ -11,9 +12,21 @@ import java.util.List;
 public class Bot {
 
     private final TelegramBot bot;
+    private final ExpenseParser parser;
+    private final FileStorage storage;
+    private final ExpenseService service;
 
     public Bot(String token) {
         bot = new TelegramBot(token);
+        parser = new ExpenseParser();
+
+        try {
+            storage = new FileStorage();
+        } catch (IOException e) {
+            throw new IllegalStateException("Не удалось создать каталог для хранения расходов", e);
+        }
+
+        service = new ExpenseService(storage);
     }
 
     public void start() {
@@ -32,7 +45,29 @@ public class Bot {
 
         long chatId = update.message().chat().id();
         String text = update.message().text();
-        String answer = processCommand(text);
+
+        String answer = "";
+        if (text.startsWith("/")) {
+            answer = processCommand(text);
+        }
+        else {
+            try {
+                ParsedExpense parsed = parser.parse(text);
+                Expense expense = service.addExpense(chatId, parsed.amount(), parsed.category(), parsed.description());
+                answer = "✅ Расход #%d добавлен!\n%s %s — %s\n%s".formatted(
+                        expense.id(),
+                        expense.category().getEmoji(),
+                        expense.category().getTitle(),
+                        expense.getFormattedAmount(),
+                        expense.description()
+                );
+            } catch (IllegalArgumentException e) {
+                answer = "Ошибка: " + e.getMessage();
+            } catch (IOException e) {
+                answer = "Не удалось сохранить расход. Попробуйте позже.";
+                e.printStackTrace();
+            }
+        }
 
         bot.execute(new SendMessage(chatId, answer));
     }
