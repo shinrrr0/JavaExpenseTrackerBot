@@ -56,7 +56,7 @@ public class Bot {
 
         String answer = "";
         if (text.startsWith("/")) {
-            answer = processCommand(text);
+            answer = processCommand(chatId,text);
         }
         else {
             try {
@@ -80,7 +80,7 @@ public class Bot {
         bot.execute(new SendMessage(chatId, answer));
     }
 
-    private String processCommand(String text) {
+    private String processCommand(long chatId,String text) {
         String[] parts = text.split(" ", 2);
         String command = parts[0];
 
@@ -88,7 +88,7 @@ public class Bot {
             case "/start" -> commandStart();
             case "/help" -> commandHelp();
             case "/categories" -> commandCategories();
-            case "/history" -> commandHistory();
+            case "/history" -> commandHistory(chatId);
             default -> "Ты написал: " + text;
         };
     }
@@ -110,8 +110,24 @@ public class Bot {
         return result.toString();
     }
 
-    private String commandHistory() {
-        return "";
+    private String commandHistory(long chatId) {
+
+        try {
+            List<Expense> expenses = service.getExpenses(chatId);
+            if (expenses.isEmpty()) return "История расходов пуста";
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = expenses.size() - 1;i >= 0 && i >= expenses.size() - 10;i--) {
+                Expense expense = expenses.get(i);
+                sb.append("#%d %s %s — %s\n".formatted(
+                        expense.id(), expense.category().getEmoji(), expense.category().getTitle(), expense.getFormattedAmount()));
+                if (!expense.description().isBlank()) sb.append(expense.description()).append("\n");
+            }
+            return sb.toString();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "Не удалось загрузить историю";
+        }
     }
 
     private String commandHelp() {
