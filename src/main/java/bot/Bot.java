@@ -10,7 +10,15 @@ import java.util.List;
 //import java.util.Random;
 
 public class Bot {
-
+    private static final String HELP_TEXT = """
+Привет!
+Это справка для того, чтобы ты разобрался, что умеет бот.
+1./start - начало работы бота
+2./categories - напишет какие категории доступны для ввода
+3./history - покажет 10 последних твоих вводов трат и категорий
+Для того, чтобы ты не ошибся, держи корректный ввод сообщения, чтобы бот добавил его в список: 
+Потраченная сумма, категория, комментарий(не обязателен). 
+Пример: 250 транспорт такси """;
     private final TelegramBot bot;
     private final ExpenseParser parser;
     private final FileStorage storage;
@@ -107,6 +115,6 @@ public class Bot {
     }
 
     private String commandHelp() {
-        return "привет";
+        return HELP_TEXT;
     }
 }
