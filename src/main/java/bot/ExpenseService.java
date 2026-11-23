@@ -15,19 +15,6 @@ public class ExpenseService {
     }
 
     public Expense addExpense(long chatId, long amount, ExpenseCategory category, String description) throws IOException {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Сумма расхода должна быть положительной");
-        }
-        if (category == null) {
-            throw new IllegalArgumentException("Неизвестная категория");
-        }
-        if (description == null ||
-                description.contains(";") ||
-                description.contains("\n") ||
-                description.contains("\r")) {
-            throw new IllegalArgumentException("Некорректное описание");
-        }
-
         List<Expense> expenses = storage.loadExpenses(chatId);
 
         long max_id = 0;

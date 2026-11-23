@@ -17,6 +17,12 @@ public class ExpenseParser {
         String s_amount = components[0];
         String s_category = components[1];
 
+        if (s_category.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    "Категория не может начинаться с символа '/'"
+            );
+        }
+
         ExpenseCategory category = ExpenseCategory.fromString(s_category);
 
         if (category == null) {
