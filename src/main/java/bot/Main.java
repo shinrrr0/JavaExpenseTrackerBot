@@ -1,5 +1,8 @@
 package bot;
 
+import bot.gateway.PengradGateway;
+import bot.gateway.TelegramGateway;
+
 public class Main {
     public static void main(String[] args) {
         String token = System.getenv("BOT_TOKEN");

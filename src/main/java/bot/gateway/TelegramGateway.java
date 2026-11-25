@@ -1,4 +1,6 @@
-package bot;
+package bot.gateway;
+
+import bot.input.Input;
 
 import java.util.function.Consumer;
 

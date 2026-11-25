@@ -1,4 +1,4 @@
-package bot;
+package bot.model;
 
 public enum ExpenseCategory {
     FOOD("еда", "🍔"),

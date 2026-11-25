@@ -1,7 +1,9 @@
-package bot;
+package bot.storage;
+
+import bot.model.Expense;
+import bot.model.ExpenseCategory;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 

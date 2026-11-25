@@ -1,5 +1,12 @@
 package bot;
 
+import bot.gateway.TelegramGateway;
+import bot.input.*;
+import bot.model.Expense;
+import bot.model.ExpenseCategory;
+import bot.storage.ExpenseService;
+import bot.storage.FileStorage;
+
 import java.io.IOException;
 
 import java.util.List;

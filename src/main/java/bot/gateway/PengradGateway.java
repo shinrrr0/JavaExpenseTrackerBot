@@ -1,5 +1,6 @@
-package bot;
+package bot.gateway;
 
+import bot.input.Input;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;

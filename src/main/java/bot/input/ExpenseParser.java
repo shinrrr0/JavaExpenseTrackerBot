@@ -1,4 +1,6 @@
-package bot;
+package bot.input;
+
+import bot.model.ExpenseCategory;
 
 import java.math.BigDecimal;
 

@@ -1,4 +1,8 @@
-package bot;
+package bot.storage;
+
+import bot.model.Expense;
+import bot.model.ExpenseCategory;
+import bot.service.ExpenseStorage;
 
 import java.io.IOException;
 import java.nio.file.Files;

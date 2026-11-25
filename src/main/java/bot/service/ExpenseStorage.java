@@ -1,4 +1,6 @@
-package bot;
+package bot.service;
+
+import bot.model.Expense;
 
 import java.io.IOException;
 import java.util.List;

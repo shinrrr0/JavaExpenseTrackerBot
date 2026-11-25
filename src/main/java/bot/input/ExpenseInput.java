@@ -1,4 +1,4 @@
-package bot;
+package bot.input;
 
 public class ExpenseInput extends Input {
 
