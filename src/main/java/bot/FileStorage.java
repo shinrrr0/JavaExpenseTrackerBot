@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
 
-public class FileStorage {
+public class FileStorage implements ExpenseStorage {
 
     private final Path dataDirectory = Path.of("data");
 

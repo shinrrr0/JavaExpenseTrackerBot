@@ -1,9 +1,5 @@
 package bot;
 
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
 import java.io.IOException;
 
 import java.util.List;
@@ -19,13 +15,13 @@ public class Bot {
 Для того, чтобы ты не ошибся, держи корректный ввод сообщения, чтобы бот добавил его в список: 
 Потраченная сумма, категория, комментарий(не обязателен). 
 Пример: 250 транспорт такси """;
-    private final TelegramBot bot;
+    private final TelegramGateway gateway;
     private final ExpenseParser parser;
     private final FileStorage storage;
     private final ExpenseService service;
 
-    public Bot(String token) {
-        bot = new TelegramBot(token);
+    public Bot(TelegramGateway gateway) {
+        this.gateway = gateway;
         parser = new ExpenseParser();
 
         try {
@@ -38,30 +34,22 @@ public class Bot {
     }
 
     public void start() {
-        bot.setUpdatesListener(this::processUpdates);
+        gateway.start(this::processInput);
     }
 
-    private int processUpdates(List<Update> updates) {
-        for (Update update : updates) {
-            processUpdate(update);
-        }
-        return UpdatesListener.CONFIRMED_UPDATES_ALL;
-    }
-
-    private void processUpdate(Update update) {
-        if (update.message() == null || update.message().text() == null) {return;}
-
-        long chatId = update.message().chat().id();
-        String text = update.message().text();
+    private void processInput(Input input) {
+        long chatId = input.chatId();
+        String text = input.text();
 
         String answer = "";
-        if (text.startsWith("/")) {
-            answer = processCommand(chatId,text);
+        if (input instanceof CommandInput command_input) {
+            answer = processCommand(command_input);
         }
-        else {
+        else if (input instanceof ExpenseInput) {
             try {
                 ParsedExpense parsed = parser.parse(text);
                 Expense expense = service.addExpense(chatId, parsed.amount(), parsed.category(), parsed.description());
+
                 answer = "✅ Расход #%d добавлен!\n%s %s — %s\n%s".formatted(
                         expense.id(),
                         expense.category().getEmoji(),
@@ -76,13 +64,17 @@ public class Bot {
                 e.printStackTrace();
             }
         }
+        else {
+            return;
+        }
 
-        bot.execute(new SendMessage(chatId, answer));
+        gateway.sendMessage(chatId, answer);
     }
 
-    private String processCommand(long chatId,String text) {
-        String[] parts = text.split(" ", 2);
-        String command = parts[0];
+    private String processCommand(CommandInput input) {
+        long chatId = input.chatId();
+        String text = input.text();
+        String command = input.command();
 
         return switch (command) {
             case "/start" -> commandStart();
@@ -92,7 +84,6 @@ public class Bot {
             default -> "Ты написал: " + text;
         };
     }
-
     private String commandStart() {
         return "Привет! Этот бот поможет тебе учитывать свои расходы\nВведи /help чтобы увидеть список доступных комманд";
     }

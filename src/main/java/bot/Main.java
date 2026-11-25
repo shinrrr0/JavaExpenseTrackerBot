@@ -8,7 +8,8 @@ public class Main {
             throw new IllegalStateException("Не задана переменная окружения BOT_TOKEN");
         }
 
-        Bot bot = new Bot(token);
+        TelegramGateway gateway = new PengradGateway(token);
+        Bot bot = new Bot(gateway);
         bot.start();
     }
 }
